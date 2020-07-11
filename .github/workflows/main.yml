@@ -1,4 +1,4 @@
-name: Deploy
+name: Lint-Build-Deploy-Master
 
 on:
   push:
@@ -6,7 +6,22 @@ on:
       - master
 
 jobs:
-  build:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 10
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+      - name: Update NPM
+        run: npm i -g npm 
+      - name: Run Prettier 
+        run: npm run lint
+      - name: Build
+        run: npm run build
+  deploy:
+    needs: lint-and-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,3 +30,4 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "gh-action-demo-1" #Must be unique in Heroku
           heroku_email: "kohchihao@gmail.com"
+  
